@@ -1,0 +1,32 @@
+# Docker compose for
+# running 'x11vnc' in a docker environment
+# [Using docker run]
+# docker build --tag thanatisia/x11vnc .
+# docker run -itd --name=x11vnc -e "DISPLAY=:0" -e "AUTH_FILE=~/.Xauthority" thanatisia/x11vnc
+
+version: "3.5"
+services:
+  x11vnc:
+    image: x11vnc
+    container_name: x11vnc
+    build:
+      context: ./docker
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    # network_mode: "host"
+    ## Environment Variables
+    environment:
+      # DISPLAY: ":0" # Set your $DISPLAY port number here
+      # AUTH: "~/.Xauthority" # Set your X display server .Xauthority file here
+      DISPLAY: ":0"
+      AUTH: "/root/.Xauthority"
+    ports:
+      ## Port map/forward/translate host system port to container port
+      ## [ip-address]:[host-system-port]:[container-port]
+      - "5906:5900"
+    volumes:
+      ## Mount host system volume to container volume
+      ## [host-system-volume]:[container-volume]:[permsission]
+      - "$HOME/.Xauthority:/root/.Xauthority:rw"
+      - "$HOME/.vnc:/root/.vnc:rw"
+      - "/tmp/.X11-unix:/tmp/.X11-unix:rw"
